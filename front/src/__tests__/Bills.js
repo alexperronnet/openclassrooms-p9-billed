@@ -2,13 +2,16 @@
  * @jest-environment jsdom
  */
 
-import {screen, waitFor} from "@testing-library/dom"
+import { screen, waitFor, fireEvent } from "@testing-library/dom"
+import Bills from "../containers/Bills"
 import BillsUI from "../views/BillsUI.js"
 import { bills } from "../fixtures/bills.js"
-import { ROUTES_PATH} from "../constants/routes.js";
-import {localStorageMock} from "../__mocks__/localStorage.js";
-
+import { ROUTES, ROUTES_PATH} from "../constants/routes.js";
+import { localStorageMock } from "../__mocks__/localStorage.js";
+import mockStore from "../__mocks__/store"
 import router from "../app/Router.js";
+
+jest.mock("../app/store", () => mockStore)
 
 describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
@@ -35,6 +38,38 @@ describe("Given I am connected as an employee", () => {
       const antiChrono = (a, b) => ((a < b) ? 1 : -1)
       const datesSorted = [...dates].sort(antiChrono)
       expect(dates).toEqual(datesSorted)
+    })
+
+    describe("When I click on new bill button", () => {
+      test("Then I should be sent on the new bill page", () => {
+        Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+        window.localStorage.setItem('user', JSON.stringify({ type: 'Employee' }))
+        document.body.innerHTML = BillsUI({data : bills})
+        const onNavigate = (pathname) => { document.body.innerHTML = ROUTES({pathname}) }
+        const newBills = new Bills({document, onNavigate, localStorage: window.localStorage, store: null})
+        const btnNewBill = screen.getByTestId('btn-new-bill')
+        const handleClickNewBill = jest.fn(newBills.handleClickNewBill)
+        btnNewBill.addEventListener('click',handleClickNewBill)
+        fireEvent.click(btnNewBill)
+        expect(handleClickNewBill).toHaveBeenCalled()
+      }) 
+    })
+
+    describe("When I click on first eye icon", () => {
+      test("Then modal should open", () => {
+        Object.defineProperty(window, localStorage, {value: localStorageMock})
+        window.localStorage.setItem("user", JSON.stringify({type: 'Employee'}))
+        document.body.innerHTML = BillsUI({data : bills})
+        const onNavigate = (pathname) => { document.body.innerHTML = ROUTES({pathname}) }
+        const newBills = new Bills({document, onNavigate, localStorage: window.localStorage, store: null})
+        $.fn.modal = jest.fn()
+        const handleClickIconEye = jest.fn(() => { newBills.handleClickIconEye })
+        const firstEyeIcon = screen.getAllByTestId("icon-eye")[0];
+        firstEyeIcon.addEventListener("click", handleClickIconEye)
+        fireEvent.click(firstEyeIcon)
+        expect(handleClickIconEye).toHaveBeenCalled();
+        expect($.fn.modal).toHaveBeenCalled();
+      })
     })
   })
 })
