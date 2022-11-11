@@ -20,6 +20,8 @@ I usually push projects to the max but to be honest this project was not interes
 
 ## Local Setup
 
+> U can find the original front [here](https://github.com/OpenClassrooms-Student-Center/Billed-app-FR-Front) & back [here](https://github.com/OpenClassrooms-Student-Center/Billed-app-FR-back)
+
 ### Clone the repository
 
 ```bash
