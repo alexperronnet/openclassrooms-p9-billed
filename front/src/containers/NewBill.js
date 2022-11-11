@@ -28,28 +28,23 @@ export default class NewBill {
 
     // If file is an image
     if (fileExtension === 'jpg' || fileExtension === 'jpeg' || fileExtension === 'png') {
-      // Hide error message if it was displayed
-      const errorFormat = this.document.querySelector('.error-format')
-      errorFormat && errorFormat.setAttribute('hidden', true)
-
-    this.store
-      .bills()
-      .create({
-        data: formData,
-        headers: {
-          noContentType: true
-        }
-      })
-      .then(({fileUrl, key}) => {
-        console.log(fileUrl)
-        this.billId = key
-        this.fileUrl = fileUrl
-        this.fileName = fileName
-      }).catch(error => console.error(error))
+      this.store
+        .bills()
+        .create({
+          data: formData,
+          headers: {
+            noContentType: true
+          }
+        })
+        .then(({fileUrl, key}) => {
+          console.log(fileUrl)
+          this.billId = key
+          this.fileUrl = fileUrl
+          this.fileName = fileName
+        }).catch(error => console.error(error))
     } else {
-      // Show error message & empty file input
-      this.document.querySelector('.error-format').hidden = false
-      this.document.querySelector(`input[data-testid="file"]`).value = ''
+      e.target.value = null
+      alert('Le fichier doit être une image')
     }
   }
   handleSubmit = e => {
